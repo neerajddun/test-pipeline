@@ -7,6 +7,18 @@ pipeline {
                 checkout scm
             }
         }
+        
+        stage ('Unit Test') {
+            steps {
+                sh 'mvn clean test'
+            }
+        }
+
+        stage ('Integration Test') {
+            steps {
+                sh 'mvn clean verify'
+            }
+        }
 
         stage ('Build') {
             steps {
