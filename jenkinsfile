@@ -29,6 +29,13 @@ pipeline {
             }
         }
 
+        stage('OWASP Dependency-Check') {
+           steps {
+             dependencyCheck additionalArguments: '--scan ./ --format XML --disableYarnAudit --disableNodeAudit', odcInstallation: 'OWASP-DepCheck'
+             dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+            }
+        }
+
         stage('Trivy FS Scan') {
             steps {
                sh 'trivy fs --format table --exit-code 0 --severity HIGH,CRITICAL --output trivy-fs-report.txt .'
