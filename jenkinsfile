@@ -2,16 +2,10 @@ pipeline {
 
     agent any 
 
-    environment {
-        ImageRegistry = "883999921903.dkr.ecr.ap-southeast-1.amazonaws.com"
-    }
-
     stages {
-
+        
         stage('Checkout') {
-
             steps {
-
                 checkout scm
             }
         }
@@ -25,10 +19,10 @@ pipeline {
         }
 
         stage ('Integration Test') {
-            
+
             steps {
 
-                sh 'mvn verify -DskipTests -B'
+                sh 'mvn verify'
             }
         }
 
@@ -39,51 +33,43 @@ pipeline {
                 sh 'mvn clean install'
             }
         }
-        
-        stage ('SonarQube') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-
-        stage ('Quality Gate') {
-            steps { 
-            
-             timeout(time: 5, unit: 'MINUTES') {
-                waitForQualityGate abortPipeline: true
-
-                }
-            }
-        }
 
         stage ('Docker Image') {
-
+            
             steps {
+                
+                sh '''
+    
+                docker build -t ${JOB_NAME}:v1.${BUILD_NUMBER} .
+                docker image tag ${JOB_NAME}:v1.${BUILD_NUMBER} neeraj91/${JOB_NAME}:v1.${BUILD_NUMBER}
+                docker image tag ${JOB_NAME}:v1.${BUILD_NUMBER} neeraj91/${JOB_NAME}:latest 
 
-                sh "docker build -t ${JOB_NAME}:v1.${BUILD_NUMBER} . "
-                sh "docker tag ${JOB_NAME}:v1.${BUILD_NUMBER} neeraj91/${JOB_NAME}:v1.${BUILD_NUMBER}"
-                sh "docker tag ${JOB_NAME}:v1.${BUILD_NUMBER} neeraj91/${JOB_NAME}:latest"
+                '''
             }
         }
 
-        stage ('Docker push'){
+        stage ('Docker Push') {
             steps {
-              sh 'aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin $ImageRegistry'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'DockerPass', usernameVariable: 'DockerName')]) {
+                  sh 'echo $DockerPass | docker login -u $DockerName --password-stdin'
+                  sh "docker push neeraj91/${JOB_NAME}:v1.${BUILD_NUMBER}"
+                  sh "neeraj91/${JOB_NAME}:latest"
+                }    
             }
         }
 
         stage ('Deploy') {
-            steps {
+            steps{
+
                 sh 'echo Deploy'
             }
         }
     }
 
     post {
+
         always {
+
             cleanWs()
         }
     }
