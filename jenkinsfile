@@ -1,13 +1,7 @@
 pipeline {
 
     agent any 
-
-    environment {
-
-        IMAGENAME = "JOB_NAME:v1"
-        IMAGETAG = "BUILD_NUMBER"
-    }
-
+    
     stages {
 
         stage ('Checkout') {
