@@ -46,7 +46,7 @@ pipeline {
 
             steps {
 
-                sh "docker build -t ${JOB_NAME}:v1.${BUILD_NUMBER}."
+                sh "docker build -t ${JOB_NAME}:v1.${BUILD_NUMBER} ."
                 sh "docker tag ${JOB_NAME}:v1.${BUILD_NUMBER} neeraj91/${JOB_NAME}:v1.${BUILD_NUMBER} "
                 sh "docker tag ${JOB_NAME}:v1.${BUILD_NUMBER} neeraj91/${JOB_NAME}:latest"
             }
