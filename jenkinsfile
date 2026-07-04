@@ -73,7 +73,6 @@ pipeline {
                         aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER} --kubeconfig ${KUBECONFIG}
                         kubectl apply -f deployment.yaml
                         kubectl apply -f service.yaml 
-                        kubectl rollout status deployment/app-dep --kubeconfig ${KUBECONFIG}
                     """
                 }
             }
