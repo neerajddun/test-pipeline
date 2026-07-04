@@ -1,25 +1,24 @@
-#------Stage: Build ------
+# ------stage: Build ------
 
-FROM maven:3.9-eclipse-temurin-17-alpine AS builder
+FROM maven:3.9-eclipse-temurinp-17-alpine AS builder
 
 WORKDIR /app
 
-COPY pom.xml .
+COPY pom.xml . 
 
-RUN mvn dependency:go-offline -B
+RUN mvn dependency:go-offline
 
-COPY src  ./src
+COPY src ./src
 
 RUN mvn verify -DskipTests -B
 
-
-#------ Stage: Run ------
+# ------Stage: Run -----
 
 FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
-COPY --from=builder /app/target/*.jar app.jar 
+COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8080
 

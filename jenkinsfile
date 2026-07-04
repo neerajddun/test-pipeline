@@ -3,10 +3,12 @@ pipeline {
     agent any 
 
     stages {
-        
-        stage('Checkout') {
+
+        stage ('Checkout') {
+
             steps {
-                checkout scm
+
+                checkout scm 
             }
         }
 
@@ -34,59 +36,6 @@ pipeline {
             }
         }
 
-        stage ('Docker Image') {
-            
-            steps {
-                
-                sh '''
-    
-                docker build -t ${JOB_NAME}:v1.${BUILD_NUMBER} .
-                docker image tag ${JOB_NAME}:v1.${BUILD_NUMBER} neeraj91/${JOB_NAME}:v1.${BUILD_NUMBER}
-                docker image tag ${JOB_NAME}:v1.${BUILD_NUMBER} neeraj91/${JOB_NAME}:latest 
-
-                '''
-            }
-        }
-
-        stage ('SonarQube') {
-            steps {
-                withSonarQubeEnv ('SonarQube') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 10, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-
-        stage ('Docker Push') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'DockerPass', usernameVariable: 'DockerName')]) {
-                  sh 'echo $DockerPass | docker login -u $DockerName --password-stdin'
-                  sh "docker push neeraj91/${JOB_NAME}:v1.${BUILD_NUMBER}"
-                  sh "docker push neeraj91/${JOB_NAME}:latest"
-                }    
-            }
-        }
-
-        stage ('Deploy') {
-            steps{
-
-                sh 'echo Deploy'
-            }
-        }
     }
 
-    post {
-
-        always {
-
-            cleanWs()
-        }
-    }
 }
