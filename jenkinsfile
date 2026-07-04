@@ -2,6 +2,12 @@ pipeline {
 
     agent any 
 
+    environment {
+
+        IMAGENAME = "JOB_NAME:v1"
+        IMAGETAG = "BUILD_NUMBER"
+    }
+
     stages {
 
         stage ('Checkout') {
@@ -33,6 +39,30 @@ pipeline {
             steps {
 
                 sh 'mvn clean install'
+            }
+        }
+
+        stage ('Docker Image') {
+
+            steps {
+
+                sh "docker build -t ${JOB_NAME}:v1.${BUILD_NUMBER}."
+                sh "docker tag ${JOB_NAME}:v1.${BUILD_NUMBER} neeraj91/${JOB_NAME}:v1.${BUILD_NUMBER} "
+                sh "docker tag ${JOB_NAME}:v1.${BUILD_NUMBER} neeraj91/${JOB_NAME}:latest"
+            }
+
+        }
+
+        stage ('Docker Push') {
+
+            steps {
+                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', passwordVariable: 'DOCKERPASS', usernameVariable: 'DOCKERNAME')]) {
+
+                sh 'echo $DOCKERPASS | docker login -u $DOCKERNAME --password-stdin'
+                sh "docker push neeraj91/${JOB_NAME}:v1.${BUILD_NUMBER}"
+                sh "docker push neeraj91/${JOB_NAME}:latest"
+                
+                 }
             }
         }
 
