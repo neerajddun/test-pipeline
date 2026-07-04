@@ -2,6 +2,12 @@ pipeline {
 
     agent any 
 
+     environment {
+        AWS_REGION  = "ap-southeast-1"
+        EKS_CLUSTER = "test-cluster"
+        KUBECONFIG  = "/var/jenkins_home/.kube/config"
+    }
+
     stages {
 
         stage ('Checkout') {
