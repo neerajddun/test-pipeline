@@ -34,7 +34,7 @@ pipeline {
             
                  sh '''
 
-                   echo $DOCKERVARS | docker login -u $DOCKERNAME --password-stdin '
+                   echo $DOCKERVARS | docker login -u $DOCKERNAME --password-stdin
                    docker push ${REPO_NAME}/${IMAGE_NAME}:${IMAGE_TAG}
                    docker push  ${REPO_NAME}/${IMAGE_NAME}:latest
 
@@ -42,7 +42,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploye') {
 
           steps {
