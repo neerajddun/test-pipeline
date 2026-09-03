@@ -30,18 +30,19 @@ pipeline {
 
           steps {
             
-            withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'DOCKERVARS', usernameVariable: 'DOCKERNAME')]) {
+               withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'DOCKERVARS', usernameVariable: 'DOCKERNAME')]) {
             
-            sh '''
+                 sh '''
 
-             echo $DOCKERVARS | docker login -u $DOCKERNAME --password-stdin '
-             docker push ${REPO_NAME}/${IMAGE_NAME}:${IMAGE_TAG}
-             docker push  ${REPO_NAME}/${IMAGE_NAME}:latest
+                   echo $DOCKERVARS | docker login -u $DOCKERNAME --password-stdin '
+                   docker push ${REPO_NAME}/${IMAGE_NAME}:${IMAGE_TAG}
+                   docker push  ${REPO_NAME}/${IMAGE_NAME}:latest
 
-             '''
+                '''
+                }
             }
         }
-    
+        
         stage('Deploye') {
 
           steps {
