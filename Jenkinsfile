@@ -36,7 +36,7 @@ pipeline {
 
                    echo $DOCKERVARS | docker login -u $DOCKERNAME --password-stdin
                    docker push ${REPO_NAME}/${IMAGE_NAME}:${IMAGE_TAG}
-                   docker push  ${REPO_NAME}/${IMAGE_NAME}:latest
+                   docker push ${REPO_NAME}/${IMAGE_NAME}:latest
 
                 '''
                 }
